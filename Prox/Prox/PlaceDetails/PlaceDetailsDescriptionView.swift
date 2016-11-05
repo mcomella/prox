@@ -69,22 +69,18 @@ class PlaceDetailsDescriptionView: HorizontalLineView {
         return self.expandableLabel.bottomAnchor.constraint(equalTo: self.bottomAnchor)
     }()
 
-    lazy var logoBottomConstraint: NSLayoutConstraint = {
-        return self.logoView.bottomAnchor.constraint(equalTo: self.descriptionTitleView.bottomAnchor)
-    }()
-
     private func setupSubviews() {
         addSubview(descriptionTitleView)
         var constraints = [descriptionTitleView.topAnchor.constraint(equalTo: topAnchor),
                            descriptionTitleView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: horizontalMargin),
-                           descriptionTitleView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -horizontalMargin)]
+                           descriptionTitleView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -horizontalMargin),
+                           descriptionTitleView.heightAnchor.constraint(equalToConstant: 56)]
 
         descriptionTitleView.addSubview(logoView)
         constraints += [logoView.leadingAnchor.constraint(equalTo: descriptionTitleView.leadingAnchor),
+                            logoView.centerYAnchor.constraint(equalTo: descriptionTitleView.centerYAnchor),
                            logoView.widthAnchor.constraint(equalToConstant: 16),
-                           logoView.heightAnchor.constraint(equalToConstant: 16),
-                           logoView.topAnchor.constraint(equalTo: descriptionTitleView.topAnchor, constant: 20),
-                           logoBottomConstraint]
+                           logoView.heightAnchor.constraint(equalToConstant: 16)]
 
         descriptionTitleView.addSubview(label)
         constraints += [label.centerYAnchor.constraint(equalTo: logoView.centerYAnchor),
@@ -128,14 +124,12 @@ class PlaceDetailsDescriptionView: HorizontalLineView {
     private func expandView() {
         expandableLabelHeightConstraint.isActive = false
         expandableLabelBottomConstraint.constant = -10
-        logoBottomConstraint.constant = -20
         self.layoutIfNeeded()
     }
 
     private func collapseView() {
         expandableLabelBottomConstraint.constant = 0
         expandableLabelHeightConstraint.isActive = true
-        logoBottomConstraint.constant = 0
         self.layoutIfNeeded()
     }
 }

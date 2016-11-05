@@ -25,10 +25,18 @@ class PlaceDetailsCardView: UIView {
         view.axis = .vertical
         view.spacing = self.margin
 
-        view.layoutMargins = UIEdgeInsets(top: self.margin, left: 0, bottom: self.CardMarginBottom, right: 0)
+        self.setContainingStackViewLayoutMargins(forView: view, isDescriptionPresent: true)
         view.isLayoutMarginsRelativeArrangement = true
         return view
     }()
+    private func setContainingStackViewLayoutMargins(forView defaultView: UIStackView? = nil,
+                                                     isDescriptionPresent: Bool) {
+        // HACK: we want to call this method when containingStackView is initializing but at that
+        // point containingStackView is not defined yet so in that case, we take it as a param.
+        let view = defaultView ?? containingStackView
+        view.layoutMargins = UIEdgeInsets(top: self.margin, left: 0,
+                                          bottom: isDescriptionPresent ? 0 : self.margin, right: 0)
+    }
 
     // MARK: Outer views.
     // TODO: accessibility labels (and parent view)
@@ -194,9 +202,7 @@ class PlaceDetailsCardView: UIView {
         updateURLText(place.url)
 
         updateHoursUI(place.hours)
-
-        updateDescriptionViewUI(forText: place.wikiDescription, onView: wikiDescriptionView)
-        updateDescriptionViewUI(forText: place.yelpDescription, onView: yelpDescriptionView)
+        updateDescriptionViewUI(forPlace: place)
 
         PlaceUtilities.updateReviewUI(fromProvider: place.yelpProvider, onView: yelpReviewView)
         PlaceUtilities.updateReviewUI(fromProvider: place.tripAdvisorProvider, onView: tripAdvisorReviewView)
@@ -219,13 +225,24 @@ class PlaceDetailsCardView: UIView {
         hoursView.secondaryTextLabel.text = secondaryText
     }
 
-    private func updateDescriptionViewUI(forText text: String?, onView view: PlaceDetailsDescriptionView) {
+    private func updateDescriptionViewUI(forPlace place: Place) {
+        let isDescriptionPresent = updateDescriptionViewUIHelper(forText: place.wikiDescription,
+                                                                 onView: wikiDescriptionView) ||
+                                   updateDescriptionViewUIHelper(forText: place.yelpDescription,
+                                                           onView: yelpDescriptionView)
+        setContainingStackViewLayoutMargins(isDescriptionPresent: isDescriptionPresent)
+    }
+
+    /* Returns true if the view is visible, false otherwise. */
+    private func updateDescriptionViewUIHelper(forText text: String?, onView view: PlaceDetailsDescriptionView) -> Bool {
         if let text = text {
             view.isHidden = false
             view.expandableLabel.text = text
+            return true
         } else {
-            view.isHidden = true
+//            view.isHidden = true
             view.expandableLabel.text = nil
+            return false
         }
     }
 
