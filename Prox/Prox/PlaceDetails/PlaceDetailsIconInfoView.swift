@@ -61,7 +61,6 @@ class PlaceDetailsIconInfoView: UIView {
         }
     }
 
-    fileprivate var secondaryTextLabelHalfHeightConstraint: NSLayoutConstraint!
     fileprivate var secondaryTextLabelFullHeightConstraint: NSLayoutConstraint!
 
     init(enableForwardArrow: Bool) {
@@ -101,14 +100,12 @@ class PlaceDetailsIconInfoView: UIView {
     }
 
     private func setupLabelContainerSubviews() -> [NSLayoutConstraint] {
-        secondaryTextLabelHalfHeightConstraint = secondaryTextLabel.heightAnchor.constraint(equalTo: labelContainer.heightAnchor, multiplier: 0.5)
         secondaryTextLabelFullHeightConstraint = secondaryTextLabel.heightAnchor.constraint(equalTo: labelContainer.heightAnchor, multiplier: 1)
 
         labelContainer.addSubview(secondaryTextLabel)
         var constraints: [NSLayoutConstraint] = [secondaryTextLabel.leadingAnchor.constraint(equalTo: labelContainer.leadingAnchor),
                                                  secondaryTextLabel.trailingAnchor.constraint(equalTo: labelContainer.trailingAnchor),
-                                                 secondaryTextLabel.bottomAnchor.constraint(equalTo: labelContainer.bottomAnchor),
-                                                 secondaryTextLabelHalfHeightConstraint]
+                                                 secondaryTextLabel.bottomAnchor.constraint(equalTo: labelContainer.bottomAnchor)]
 
         labelContainer.addSubview(primaryTextLabel)
         constraints += [primaryTextLabel.topAnchor.constraint(equalTo: labelContainer.topAnchor),
@@ -122,11 +119,9 @@ class PlaceDetailsIconInfoView: UIView {
     private func setPrimaryTextLabelHidden(_ isHidden: Bool) {
         if isHidden {
             primaryTextLabel.isHidden = true
-            secondaryTextLabelHalfHeightConstraint.isActive = false
             secondaryTextLabelFullHeightConstraint.isActive = true
         } else {
             primaryTextLabel.isHidden = false
-            secondaryTextLabelHalfHeightConstraint.isActive = true
             secondaryTextLabelFullHeightConstraint.isActive = false
         }
     }
