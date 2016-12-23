@@ -63,7 +63,7 @@ class FirebaseEventsDatabase: EventsDatabase {
         let deferred = Deferred<DatabaseResult<Event>>()
 
         let detailRef = eventDetailsRef.child(key)
-        detailRef.queryOrderedByKey().observeSingleEvent(of: .value) { (data: FIRDataSnapshot) in
+        detailRef.observeSingleEventButDownloadUpdates(of: .value) { (data: FIRDataSnapshot) in
             guard data.exists() else {
                 deferred.fill(with: DatabaseResult.fail(withMessage: "Event with key \(key) does not exist"))
                 return

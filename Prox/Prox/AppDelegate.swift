@@ -75,7 +75,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 dump(user)
             }
         }
-        FIRDatabase.database().persistenceEnabled = false
+
+        // Allow Firebase data to be cached offline. Firebase is intended to be used by listening
+        // for streaming updates but we one-off query it instead so this complicates the caching.
+        //
+        // When one-off querying cached values, the cached value will be returned and the value will
+        // *never* be updated from the server (see http://stackoverflow.com/a/24516952 ).
+        // To work-around this, you can:
+        //   1) call `FIRDatabaseReference.keepSynced(true)` and one-off query.
+        //   2) call `FIRDatabaseReference.observeSingleEventButDownloadUpdates`. Be sure to rm the
+        // observers.
+        //
+        // In our case:
+        //   - we use 1) on our geofire locations because geofire doesn't let us query any other way
+        // and the dataset is small enough.
+        //   - we use 2) on our place/event details because leaving `keepSynced` on could be
+        // expensive (CPU, mem, network data) and managing the state is complex.
+        let db = FIRDatabase.database()
+        db.persistenceEnabled = true
+        for geofirePathObj in [AppConstants.PlacePaths, AppConstants.EventPaths] {
+            let geofirePath = geofirePathObj.geofire
+            db.reference(withPath: geofirePath).keepSynced(true)
+        }
     }
 
     private func setupRemoteConfig() {

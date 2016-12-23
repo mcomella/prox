@@ -76,9 +76,9 @@ class FirebasePlacesDatabase: PlacesDatabase {
 
     private func queryChildPlaceDetails(by placeKey: String) -> Deferred<DatabaseResult<Place>> {
         let deferred = Deferred<DatabaseResult<Place>>()
-
         let childRef = placeDetailsRef.child(placeKey)
-        childRef.queryOrderedByKey().observeSingleEvent(of: .value) { (data: FIRDataSnapshot) in
+
+        childRef.observeSingleEventButDownloadUpdates(of: .value) { (data: FIRDataSnapshot) in
             guard data.exists() else {
                 deferred.fill(with: DatabaseResult.fail(withMessage: "Child place key does not exist: \(placeKey)"))
                 return
