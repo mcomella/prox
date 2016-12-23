@@ -4,6 +4,7 @@
 
 import AFNetworking
 import Deferred
+import FirebaseDatabase
 import FirebaseRemoteConfig
 import Foundation
 
@@ -121,6 +122,9 @@ class PlacesProvider {
     }
 
     private func retryQueryPlaces(location: CLLocation, withRadius radius: Double, retriesLeft: Int, lastCount: Int) {
+        // Clear observers to ensure we don't add duplicate observers.
+        FIRDatabaseReference.clearContinuingObservers()
+
         // Fetch a stable list of places from firebase.
         // In the event of the server crawling (from a cold start, for example)
         // the server will be adding places to firebase.

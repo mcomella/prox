@@ -119,6 +119,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // if there is a timer running, cancel it. We'll wait until background app refresh fires instead
         placeCarouselViewController?.locationMonitor.cancelTimeAtLocationTimer()
         eventsNotificationsManager.persistNotificationCache()
+        FIRDatabaseReference.clearContinuingObservers()
         AppState.enterBackground()
     }
 
