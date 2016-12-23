@@ -107,6 +107,8 @@ public struct AppConstants {
     // The root child in the Realtime Firebase database.
     public static let firebaseRoot: String = {
         #if MOZ_CHANNEL_DEBUG
+            // Adding "$name/" allows you to develop against a locally run database.
+            // TODO prox-server – allow this string to be passed in as a URL parameter.
             return ""
         #elseif MOZ_CHANNEL_ENTERPRISE
             return "production/"
@@ -116,4 +118,23 @@ public struct AppConstants {
             return ""
         #endif
     }()
+
+    static let PlacePaths = GeofirePaths(AppConstants.firebaseRoot + "venues/")
+    static let EventPaths = GeofirePaths(AppConstants.firebaseRoot + "events/")
+}
+
+/*
+ * Describes the paths used to access Firebase values.
+ */
+struct GeofirePaths {
+
+    let geofire: String
+    let details: String
+
+    // subtree should be: <root>/<subtree>/
+    init(_ subtree: String) {
+        assert(subtree.isEmpty || subtree.hasSuffix("/"))
+        self.geofire = subtree + "locations/"
+        self.details = subtree + "details/"
+    }
 }

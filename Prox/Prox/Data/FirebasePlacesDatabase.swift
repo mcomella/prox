@@ -7,12 +7,8 @@ import Firebase
 import Deferred
 import CoreLocation
 
-// Adding "$name/" allows you to develop against a locally run database.
-// TODO prox-server – allow this string to be passed in as a URL parameter when in debug mode. 
-private let ROOT_PATH = AppConstants.firebaseRoot
-private let VENUES_PATH = ROOT_PATH + "venues/"
-private let GEOFIRE_PATH = VENUES_PATH + "locations/"
-private let DETAILS_PATH = VENUES_PATH + "details/"
+private let GEOFIRE_PATH = AppConstants.PlacePaths.geofire
+private let DETAILS_PATH = AppConstants.PlacePaths.details
 
 class FirebasePlacesDatabase: PlacesDatabase {
 
