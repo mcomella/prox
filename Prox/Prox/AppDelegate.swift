@@ -45,7 +45,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // create root view
         placeCarouselViewController = PlaceCarouselViewController()
         locationMonitor.delegate = placeCarouselViewController
-        window?.rootViewController = placeCarouselViewController
+
+        if AppConstants.BuildChannel != .Chicago {
+            window?.rootViewController = placeCarouselViewController
+        } else {
+            // TODO: It'd be great to consolidate this with Enterprise Kona's faking solution.
+            let fakeLocationSelectionController = FakeLocationSelectionTableViewController()
+            fakeLocationSelectionController.nextViewController = placeCarouselViewController
+            fakeLocationSelectionController.locationMonitor = locationMonitor
+            window?.rootViewController = fakeLocationSelectionController
+        }
 
         if #available(iOS 10.0, *) {
             self.setupUserNotificationCenter()
@@ -130,7 +139,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
-        placeCarouselViewController?.locationMonitor.refreshLocation()
+        if AppConstants.BuildChannel != .Chicago {
+            placeCarouselViewController?.locationMonitor.refreshLocation()
+        }
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
