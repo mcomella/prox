@@ -729,3 +729,9 @@ extension PlaceDetailViewController: FilterViewControllerDelegate {
         dataSource.refresh(enabledFilters: enabledFilters, topRatedOnly: topRatedOnly)
     }
 }
+
+extension PlaceDetailViewController: MapViewControllerDelegate {
+    func mapViewController(selectedPlace: Place) {
+        openCard(forPlaceWithEvent: selectedPlace) // this method doesn't fucking work!
+    }
+}
