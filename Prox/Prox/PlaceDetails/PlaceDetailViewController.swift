@@ -306,6 +306,24 @@ class PlaceDetailViewController: UIViewController {
         }
     }
 
+    func openCard(forExistingPlace placeToOpen: Place) {
+        guard let index = dataSource?.index(forPlace: currentCardViewController.place),
+            let desiredIndex = dataSource?.index(forPlace: placeToOpen) else { return }
+
+        if index == desiredIndex {
+            return
+        } else if index < desiredIndex {
+            for _ in 0..<desiredIndex-index {
+                pageToNextPlaceCard(animateWithDuration: 0)
+            }
+
+        } else { // index > desired
+            for _ in 0..<index-desiredIndex {
+                pageToPreviousPlaceCard(animateWithDuration: 0)
+            }
+        }
+    }
+
     fileprivate func pageForwardToCard(forPlace place: Place) {
         guard let newCurrentViewController = insertNewCardViewController(forPlace: place) else { return }
 
@@ -658,6 +676,7 @@ class PlaceDetailViewController: UIViewController {
 
     @objc private func openMapView() {
         let controller = MapViewController()
+        controller.delegate = self
         controller.placesProvider = dataSource
         controller.locationProvider = locationProvider
         self.present(controller, animated: true)
@@ -731,7 +750,8 @@ extension PlaceDetailViewController: FilterViewControllerDelegate {
 }
 
 extension PlaceDetailViewController: MapViewControllerDelegate {
-    func mapViewController(selectedPlace: Place) {
-        openCard(forPlaceWithEvent: selectedPlace) // this method doesn't fucking work!
+    func mapViewController(didSelect selectedPlace: Place) {
+        openCard(forPlaceWithEvent: selectedPlace)
+//        openCard(forExistingPlace: selectedPlace)
     }
 }

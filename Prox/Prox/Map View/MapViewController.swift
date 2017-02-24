@@ -20,7 +20,7 @@ private let footerBottomOffset = Style.cardViewCornerRadius
 private let footerCardMargin = 16
 
 protocol MapViewControllerDelegate: class {
-    func mapViewController(selectedPlace: Place)
+    func mapViewController(didSelect: Place)
 }
 
 class MapViewController: UIViewController {
@@ -104,7 +104,7 @@ class MapViewController: UIViewController {
 
     @objc private func closeWithSelected() {
         if let selectedPlace = selectedPlace {
-            delegate?.mapViewController(selectedPlace: selectedPlace)
+            delegate?.mapViewController(didSelect: selectedPlace)
         }
         close()
     }
@@ -159,6 +159,7 @@ extension MapViewController: GMSMapViewDelegate {
             return true // if we return false, the map will do move & display an overlay, which we don't want.
         }
 
+        selectedPlace = place
         placeFooter.update(for: place)
         if placeFooter.alpha != 1 {
             UIView.animate(withDuration: 0.4) {
