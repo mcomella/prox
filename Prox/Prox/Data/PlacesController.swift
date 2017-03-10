@@ -187,10 +187,21 @@ class PlacesProvider {
         delegate?.placesProvider(self, didUpdatePlaces: displayedPlaces)
     }
 
+    /// Returns a copy of all places. The caller should not be locked.
+    func getAllPlacesCopy() -> [Place] {
+        return getCopy(forPlaces: self.allPlaces)
+    }
+
+    /// Returns a copy of the displayed places. The caller should not be locked.
     func getDisplayedPlacesCopy() -> [Place] {
+        return getCopy(forPlaces: self.displayedPlaces)
+    }
+
+    /// Returns a copy of the given place list. The caller should not be locked.
+    private func getCopy(forPlaces places: [Place]) -> [Place] {
         var placesCopy: [Place] = []
         placesLock.withReadLock {
-            placesCopy = Array(self.displayedPlaces)
+            placesCopy = Array(places)
         }
         return placesCopy
     }
