@@ -13,6 +13,8 @@ struct PlaceDataSourceError: Error {
 
 fileprivate let placesFetchMonitorIdentifier = "PlaceFetchRadiusMonitor"
 
+private let timeBetweenSorts: TimeInterval = 65 // According to logs I've seen, 60s is the time between Apple rate-limits, + a delta.
+
 class PlaceCarouselViewController: UIViewController {
 
     lazy var placesProvider: PlacesProvider = {
@@ -33,6 +35,8 @@ class PlaceCarouselViewController: UIViewController {
     fileprivate var locationMonitor: LocationMonitor { return (UIApplication.shared.delegate! as! AppDelegate).locationMonitor }
 
     fileprivate var shouldFetchPlaces: Bool = true
+
+    fileprivate var lastPlacesSort: Date?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -70,15 +74,23 @@ class PlaceCarouselViewController: UIViewController {
 
     @objc fileprivate func willEnterForeground() {
         self.shouldFetchPlaces = true
+        lastPlacesSort = nil
     }
 
     fileprivate func updatePlaces(forLocation location: CLLocation) {
         // don't bother fetching new places when in the background.
         if UIApplication.shared.applicationState != .background {
+            let now = Date()
             if shouldFetchPlaces {
+                self.lastPlacesSort = now
                 fetchPlaces(forLocation: location)
-            } else {
-                // re-sort places based on new location
+
+            // Location is updated frequently (this method may be called multiple times when to provide
+            // finer-grain location updates) so to avoid unnecessary resource use (including Apple rate limits),
+            // limit how often we sort.
+            } else if let lastPlacesSort = lastPlacesSort,
+                    Date(timeInterval: timeBetweenSorts, since: lastPlacesSort) < now {
+                self.lastPlacesSort = now
                 placesProvider.sortPlaces(byLocation: location)
             }
         }

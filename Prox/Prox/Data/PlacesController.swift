@@ -165,11 +165,31 @@ class PlacesProvider {
         }
     }
 
+    // TODO: This is a minor variation on `displayPlaces`, meaning there is duplicated code -
+    // it'd be great to merge them.
     func sortPlaces(byLocation location: CLLocation) {
-        self.placesLock.withWriteLock {
-            guard !topRatedOnly else { return }
-            let sortedPlaces = PlaceUtilities.sort(places: displayedPlaces, byDistanceFromLocation: location)
-            self.displayedPlaces = sortedPlaces
+        guard !topRatedOnly else { return }
+
+        // Like `displayPlaces`, we sort the places the user will see first to prevent these places
+        // from not having travel times (since we'll likely get rate limited sorting all places).
+        let placesUserWillSee = getDisplayedPlacesCopy()
+        PlaceUtilities.sort(places: placesUserWillSee, byTravelTimeFromLocation: location) { _ in }
+
+        // Sort `allPlaces`, despite the obvious inefficiency, because this class expects it to be sorted.
+        let placesForSortRequest = getAllPlacesCopy()
+        PlaceUtilities.sort(places: placesForSortRequest, byTravelTimeFromLocation: location) { sortedPlaces in
+            self.placesLock.withWriteLock {
+
+                // The places could change, e.g. from filtering. To reduce the number of cases we
+                // need to handle here, we only update the places if they haven't already been updated elsewhere.
+                if placesForSortRequest.elementsEqual(self.allPlaces, by: { l, r in l.id == r.id }) {
+                    self.allPlaces = sortedPlaces
+                    self.updateDisplayedPlaces()
+                    // The user is expected to see the updated sort when they generate new cards,
+                    // that is when they swipe left or right. Instead, maybe we should delegate to a didSort,
+                    // to allow the UI to decide how they want to handle this.
+                }
+            }
         }
     }
 
