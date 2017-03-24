@@ -224,9 +224,9 @@ class PlaceDetailsCardViewController: UIViewController {
     }
 
     func beginAutoMovingOfCarousel() {
-        carouselTimer = Timer.scheduledTimer(timeInterval: 6, target: self,
-                                             selector: #selector(autoMoveToNextCarouselImage), userInfo: nil,
-                                             repeats: true)
+//        carouselTimer = Timer.scheduledTimer(timeInterval: 6, target: self,
+//                                             selector: #selector(autoMoveToNextCarouselImage), userInfo: nil,
+//                                             repeats: true)
     }
 
     func stopAutoMovingOfCarousel() {
